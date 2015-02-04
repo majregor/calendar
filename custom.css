@@ -1,0 +1,57 @@
+#event_edit_container {
+	overflow-y: auto !important;
+	overflow-x: hidden;
+	margin: auto;
+	width: 98%;
+	position: relative;
+}
+
+.fc-day-grid-container {
+	overflow-x: hidden;
+	overflow-y: auto !important;
+	position: relative;
+	width: 100%;
+}
+
+#calendar {
+	max-width: 98%;
+	margin: 0 auto;
+	height: 100%;
+}
+
+.calendar-fieldset {
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+.ui-dialog{
+	background:#ECECEC;
+}
+.ui-dialog .ui-dialog-content {
+	padding: .5em;
+}
+
+form#new-calendar-event-form label {
+	display: block;
+	margin: 2px;
+}
+
+form#new-calendar-event-form ul, form#dialog-edit-form ul{
+	list-style-type: none;
+	list-style:none;
+	padding: .5em;
+	margin: 0em;
+}
+form#new-calendar-event-form ul li, form#dialog-edit-form ul li{
+	list-style-type: square;
+	list-style:square;
+	padding-bottom:5px;
+}
+
+form#new-calendar-event-form textarea, form#dialog-edit-form textarea{
+	width:90%;
+}
+#title, #title-ed, #start-ed, #end-ed, #startTime, #endTime{
+	padding:5px;
+	width:80%;
+}
