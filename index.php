@@ -8,13 +8,43 @@ require dirname(__FILE__) . '/php/utils.php';
 <head>
 <meta charset='utf-8' />
 
+<style type="text/css">
+ul#keymap{
+	list-style:none;
+	list-style-type:none;
+	padding:0px;
+	margin:0px;
+	font-size:.97em;
+}
 
+ul#keymap li{
+	float:left;
+	margin:10px;
+	list-style:none;
+	list-style-type:none;
+}
+ul#keymap span{
+	margin:0px 4px -2px 4px;
+	display:inline-block; 
+	width:15px; height:15px; 
+}
+ul#keymap span.blue{background-color:#3A87AD}
+ul#keymap span.pink{background-color:#ff9f89 }
+ul#keymap span.grey{background-color:#BFEFFF}
+</style>
 </head>
 <body>
-
+<div>
+    	<ul id="keymap">
+        	<li><span class="blue"></span>SME event</li>
+            <li><span class="pink"></span>Webinar</li>
+            <li><span class="grey"></span>Fully booked SME event</li>
+        </ul>
+    </div>
+    <br style="clear:both;"/>
 	<div id='loading'>loading...</div>
 	<div id='calendar'></div>
-	<p>&nbsp;</p>
+	
     
     <div id="waiting-dialog" title="Event Fully Booked!">
     	<div id="">

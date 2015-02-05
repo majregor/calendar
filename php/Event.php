@@ -113,7 +113,7 @@ class Event {
 		$this->type = $type;
 	}
 	public function getType() {
-		return $type->type;
+		return $this->type;
 	}
 	
 	public  function makeBooking($eventId, $userId, $positions=1){
@@ -274,6 +274,34 @@ class Event {
 			$ex->getMessage ();
 		}
 	}
+	public static function getAllEventObjs() {
+		try {
+			$query = "SELECT id, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i') AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i') AS endTime, location, max, color, type, allDay FROM tbl_event_calendar";
+			$result = DBConnection::read ( $query );
+			$eventObjs = array();
+			
+			while($resultRow = mysql_fetch_object ( $result )){
+				$eventObj = null;
+				$eventObj = new Event ();
+				$eventObj->id = $resultRow->id;
+				$eventObj->title = $resultRow->title;
+				$eventObj->body = $resultRow->body;
+				$eventObj->startTime = $resultRow->startTime;
+				$eventObj->endTime = $resultRow->endTime;
+				$eventObj->location = $resultRow->location;
+				$eventObj->max = $resultRow->max;
+				$eventObj->color = $resultRow->color;
+				$eventObj->type = $resultRow->type;
+				$eventObj->allDay = $resultRow->allDay;
+				$eventObj->setAvailablePositions();
+				array_push($eventObjs, $eventObj);
+			}
+			return $eventObjs;
+		} catch ( Exception $ex ) {
+			$ex->getMessage ();
+		}
+	}
+	
 	
 	public static function getEventUsing($title, $start, $end) {
 		try {

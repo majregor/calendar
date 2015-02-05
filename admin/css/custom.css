@@ -1,0 +1,22 @@
+@charset "UTF-8";
+/* CSS Document */
+
+#wrapper{
+	margin:10px;
+	width:100%;
+}
+#left-wrapper, #content-wrapper{
+	
+}
+
+#left-wrapper{
+	
+}
+#content-wrapper{
+	float:right;
+	width:65%;
+}
+
+#content-wrapper table.newEvent td{
+	padding:5px;
+}

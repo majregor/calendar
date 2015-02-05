@@ -11,7 +11,10 @@
     $action = null;
     if(isset($_REQUEST['action']))
       $action = $_REQUEST['action'];
-    
+
+	$q=isset($_REQUEST['q']) ? $_REQUEST['q'] : "";
+	$q1=isset($_REQUEST['q1']) ? $_REQUEST['q1'] : "";
+	
     if($action == 'save'){
     	$title = addslashes($_REQUEST['title']);
     	$body = addslashes($_REQUEST['body']);
@@ -103,7 +106,27 @@
 		$max = isset($_REQUEST['max']) ? $_REQUEST['max'] : "";
 		$type = isset($_REQUEST['eventType']) ? $_REQUEST['eventType'] : "";
 		$color = isset($_REQUEST['eventColor']) ? $_REQUEST['eventColor'] : "";
-      
+		if($type=="webinar")
+			$color = "#ff9f89";
+			
+		//Create errors
+		$errors = array();
+		if($title==""){
+			array_push($errors, "Title can not be blank!");
+		}
+		if($start==""){
+			array_push($errors, "Enter event start time");
+		}if($end==""){
+			array_push($errors, "Enter event end time");
+		}
+		
+		
+		if(count($errors) >0){
+			$_SESSION['errors']= $errors;
+			header("Location:../admin/index.php");
+			break;
+		}
+		
       //now create the Event object...
       $eventObj = new Event();
       $eventObj->setTitle($title);
@@ -117,8 +140,8 @@
 	  $eventObj->setType($type);
       $event = new Event();
       $event->save($eventObj);
-	  //echo $end;
-	  header("Location:../admin.php?q=saved");
+	  
+	  header("Location:../admin/index.php?result=Event saved");
 	}
 	else if($action == 'book'){
 		$eventId 		=	isset($_REQUEST['id'])			? 	$_REQUEST['id']			: 	"";
@@ -137,5 +160,13 @@
 		  $eventObj->addUserToWaitingList($user);
             echo ("Added Successfully");
         }
+	}
+	else if($action == "show"){
+		if($q=="events"){
+			$eventList = Event::getAllEventObjs();
+			$dynStr="";
+			include_once("includes/data_show_events.php");
+			echo $dynStr;
+		}
 	}
 ?>
