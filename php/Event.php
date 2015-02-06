@@ -221,7 +221,8 @@ class Event {
 	}
 	public static function update($event) {
 		try {
-			$query = "UPDATE tbl_event_calendar SET title = '$event->title', body = '$event->body', start_time='$event->startTime', end_time='$event->endTime', location = '$event->location', modified_by = $event->modifiedBy, modification_date = NOW(), max=$event->max, color='$event->color' type='$event->type', allDay=$event->allDay WHERE id = $event->id";
+			$query = "UPDATE tbl_event_calendar SET title = '$event->title', body = '$event->body', start_time='$event->startTime', end_time='$event->endTime', location = '$event->location', modified_by = $event->modifiedBy, modification_date = NOW(), max=$event->max, color='$event->color', type='$event->type', allDay=$event->allDay WHERE id = $event->id";
+			echo $query;
 			DBConnection::save ( $query );
 		} catch ( Exception $ex ) {
 			$ex->getMessage ();

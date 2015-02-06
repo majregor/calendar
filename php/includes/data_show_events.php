@@ -12,7 +12,7 @@ $dynStr .= <<<EOF
         <th>Location/Link</th>
         <th>Slots Available</th>
         <th>Total Slots</th>
-		<th colspan="2">Actions</th>
+		<th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -28,8 +28,8 @@ EOF;
         $dynStr .= "<td>" . $event->getLocation() . "</td>";
         $dynStr .= "<td>" . $event->getAvailablePositions() . "</td>";
         $dynStr .= "<td>" . $event->getMax() . "</td>";
-		$dynStr .= "<td><a href='?action=edit&q=event&q1=" . $event->getId() . "'>Edit</a></td>";
-		$dynStr .= "<td><a href='?action=delete&q=event&q1=" . $event->getId() . "'>Delete</a></td>";
+		$dynStr .= "<td><a onClick='return showEditDialog(event, ".$event->getId().",\"".$event->getTitle()."\",\"".$event->getType()."\",\"".$event->getLocation()."\",\"".$event->getBody()."\")'  href='?action=edit&q=event&q1=" . $event->getId() . "'>Edit</a></td>";
+		//$dynStr .= "<td><a onClick='return showDeleteDialog(event, ".$event->getId().")' href='?action=delete&q=event&q1=" . $event->getId() . "'>Delete</a></td>";
 		$dynStr .= "</tr>";
 	}
 	

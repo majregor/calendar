@@ -126,6 +126,13 @@ $(function() {
 			?>
     <?php endif ?>
     
+    <?php if($action=="edit"): ?>
+    	<?php if($q=="event"){
+        	include("embeds/edit_event.php");
+			}
+			?>
+    <?php endif ?>
+    
     </div>
     
     <br style="clear:both;"/>

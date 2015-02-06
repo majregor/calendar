@@ -68,20 +68,13 @@
       $body = addslashes($_REQUEST['body']);
       $start = $_REQUEST['start'];
       $end = $_REQUEST['end'];
+	  $type = $_REQUEST['type'];
      
       $location = addslashes($_POST['location']);
       //now fetch the event object form the database...using title, start and end...
       $eventObj = Event::getEvent($id);
       //now set the new value to the object.
-      $modifiedBy = null;
-      if($userObj->user_level == '01'){
-          $userObject = getUserFromThisSubDistrictWithStatus($_SESSION['SUB_DISTRICT_ID'], 'Active');
-          if(!empty($userObject)){
-              $modifiedBy = $userObject->id;
-          }
-      }else if($userObj->user_level == '02'){
-          $modifiedBy = $_SESSION['LOGGED_USER_ID'];
-      }
+      $modifiedBy = 1;
       $eventObj->id = $id;
       $eventObj->title = $title;
       $eventObj->body = $body;
@@ -89,6 +82,8 @@
       $eventObj->endTime = $end;
       $eventObj->modifiedBy = $modifiedBy;
       $eventObj->location = $location;
+	  $eventObj->type = $type;
+	  $eventObj->color = ($type=="webinar") ? "#ff9f89" : "#3A87AD";
       if($eventObj != null){
         Event::update($eventObj);
       }
