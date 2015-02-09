@@ -5,7 +5,7 @@
 include("edit_event.php");
 ?>
 <script language="javascript">
-var selectedEventId, selectedEventTitle, selectedEventType, selectedEventLocation, selectedEventBody,selectedEventStatus;
+var selectedEventId, selectedEventTitle, selectedEventType, selectedEventLocation, selectedEventBody,selectedEventStatus, selectedEventUser;
 
 $(document).ready(function() {
 	populateEvents();
@@ -18,6 +18,7 @@ $(document).ready(function() {
 			 buttons: {
 				 "Save": editEvent,
 				 "Close Event" : closeEvent,
+				 "Book Slot": bookUser,
 				 "Delete": deleteEvent,
 				 Cancel: function() {
 					 $( this ).dialog( "close" );
@@ -40,7 +41,7 @@ $(document).ready(function() {
 				 }
 			 });
 	
-	function showEditDialog(event, eventId, title, type, location, body, status){
+	function showEditDialog(event, eventId, title, type, location, body, status, user){
 		event.preventDefault();
 		selectedEventId 		= eventId;
 		selectedEventTitle		= title; 
@@ -48,6 +49,7 @@ $(document).ready(function() {
 		selectedEventLocation	= location; 
 		selectedEventBody		= body;
 		selectedEventStatus		= status;
+		selectedEventUser		= user;
 		$("#title-ed").val(selectedEventTitle);
 		$("#location-ed").val(selectedEventLocation);
 		$("#body-ed").val(selectedEventBody);
@@ -152,6 +154,27 @@ $(document).ready(function() {
 				location.reload();
 			}
 		}
+		function bookUser(){
+			
+			if(confirm("Send to booking list?")){
+				
+				var dataString = "action=book&id=" + selectedEventId+"&user="+selectedEventUser+"&positions=1";
+			    $.ajax({
+	                   url: '../php/eventsController.php',
+	                   data: dataString,
+	                   type:'POST',
+	                   success:function(response){
+	                   	
+	                   },
+	                   error:function(error){
+	                     alert(error);
+	                   }
+	                 });
+
+				editDialogOpenEvent.dialog( "close" );
+				location.reload();
+			}
+		}
 		
 		function editEvent(){
 			 var valid=true;
@@ -199,7 +222,7 @@ $(document).ready(function() {
 	
 	function populateEvents(){
 			
-			var dataString="action=show&q=events";
+			var dataString="action=show&q=waiting";
 			//alert($('#selectedDate').html());
 			 $.ajax({
 	                   url: '../php/eventsController.php',

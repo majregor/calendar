@@ -4,6 +4,7 @@
     require_once 'DBConnection.php';
     require_once 'Event.php';
     require_once 'user.php';
+	require_once 'Booking.php';
 
  
    // $userObj = getUser($_SESSION['LOGGED_USER_ID']);
@@ -40,7 +41,7 @@
           //now I need to read all events only created by the session owner...
           $eventList = null;
           
-        $eventList = Event::getAllEventsForUser(1);
+        $eventList = Event::getAllOpenEventsForUser(1);
     	$events = array();
 		/*foreach($eventList as &$event){
 			$event->setAvailablePositions();
@@ -59,6 +60,7 @@
 		   $eventArray['type'] = $row->type;
 		   $eventArray['all-day'] = $row->allDay;
 		   $eventArray['availablePositions'] = Event::getEventAvailablePositions($row->id, $row->max);
+		   $eventArray['status'] = $row->status;
     	   $events[] = $eventArray;
     	}
     	echo json_encode($events);
@@ -88,8 +90,14 @@
         Event::update($eventObj);
       }
     }else if($action == 'delete'){
-      $id = $_POST['id'];
-      Event::delete($id);
+      $id = isset($_REQUEST['id']) ? $_REQUEST['id'] : "";
+	  $q = isset($_REQUEST['q']) ? $_REQUEST['q'] : "";
+	  if($q=="booking"){
+		  Booking::delete($id);
+	  }
+	  elseif($q=="event" || $q==""){
+      	Event::delete($id);
+	  }
     }
 	else if($action == 'createEvent'){
 		$title = isset($_REQUEST['title']) ? $_REQUEST['title'] : "";
@@ -101,6 +109,8 @@
 		$max = isset($_REQUEST['max']) ? $_REQUEST['max'] : "";
 		$type = isset($_REQUEST['eventType']) ? $_REQUEST['eventType'] : "";
 		$color = isset($_REQUEST['eventColor']) ? $_REQUEST['eventColor'] : "";
+		$status = isset($_REQUEST['status']) ? $_REQUEST['status'] : "";
+		
 		if($type=="webinar")
 			$color = "#ff9f89";
 			
@@ -133,6 +143,7 @@
 	  $eventObj->setMax($max);
 	  $eventObj->setColor($color);
 	  $eventObj->setType($type);
+	  $eventObj->setStatus($status);
       $event = new Event();
       $event->save($eventObj);
 	  
@@ -150,11 +161,22 @@
 	else if($action == 'queue'){
 		$eventId 		=	isset($_REQUEST['id'])			? 	$_REQUEST['id']			: 	"";
 		$user			=	isset($_REQUEST['user'])			? 	$_REQUEST['user'] 		: 	"";
-		$eventObj = Event::getEventObj($eventId);
-        if($user!=""){
-		  $eventObj->addUserToWaitingList($user);
-            echo ("Added Successfully");
-        }
+		$user			=	isset($_REQUEST['user'])			? 	$_REQUEST['user'] 		: 	"";
+		$q			=	isset($_REQUEST['q'])			? 	$_REQUEST['q'] 		: 	"";
+		$q1			=	isset($_REQUEST['q1'])			? 	$_REQUEST['q1'] 		: 	"";
+		
+		if($q == "booking"){
+			$bookingObj = new Booking();
+			$bookingObj = $bookingObj->read($q1);
+			$bookingObj->sendToWaiting();
+		}
+		elseif($q=="event" || $q==""){
+			$eventObj = Event::getEventObj($eventId);
+			if($user!=""){
+			  $eventObj->addUserToWaitingList($user);
+				echo ("Added to waiting list");
+			}
+		}
 	}
 	else if($action == "show"){
 		if($q=="events"){
@@ -163,5 +185,35 @@
 			include_once("includes/data_show_events.php");
 			echo $dynStr;
 		}
+		elseif($q=="booked"){
+			if($q1 != "" && $q1 != "all"){
+				$bookingList = Booking::getAllBookings($q1);
+			}
+			else{
+				$bookingList = Booking::getAllBookings();
+			}
+			$dynStr="";
+			include_once("includes/data_show_booked.php");
+			echo $dynStr;
+		}
+		else if($q=="waiting"){
+			
+			$waitingList = Event::getWaitingEventObjs();
+			$dynStr="";
+			include_once("includes/data_show_waiting.php");
+			echo $dynStr;
+		}
 	}
+	else if($action == 'close_event'){
+      $id = isset($_POST['id']) ? $_POST['id'] : "";
+	  if($id != ""){
+      	Event::changeStatus($id, 'closed');
+	  }
+    }
+	else if($action == 'open_event'){
+      $id = isset($_POST['id']) ? $_POST['id'] : "";
+	  if($id != ""){
+      	Event::changeStatus($id, 'open');
+	  }
+    }
 ?>

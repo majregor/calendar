@@ -1,5 +1,10 @@
 <?php
   session_start();
+  	require_once '../php/DBConnection.php';
+    require_once '../php/Event.php';
+    require_once '../php/user.php';
+	require_once '../php/Booking.php';
+
 $result = isset($_GET['result'])? $_GET['result'] : "";
 $action = isset($_GET['action']) ? $_GET['action'] : "show";
 $q = isset($_GET['q']) ? $_GET['q'] : "events";
@@ -100,13 +105,13 @@ $(function() {
 			?>
                 <div class="alert alert-danger" role="alert">
 				<strong>Error!</strong>
-                <?
+                <?php
 				foreach($_SESSION['errors'] as $error){ 
         			  echo (" [ " . $error . " ]"); 
 				}
 				?>
       			</div>
-            <?
+            <?php
         }
 ?>
     
@@ -114,7 +119,13 @@ $(function() {
     
     <?php if($action=="show"): ?>
     	<?php if($q=="events"){
-        	include("embeds/show_events.php");
+        		include("embeds/show_events.php");
+			}
+			else if($q=="booked"){
+				include("embeds/show_booked.php");
+			}
+			else if($q=="waiting"){
+				include("embeds/show_waiting.php");
 			}
 			?>
     <?php endif ?>

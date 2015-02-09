@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.3.8
+-- version 4.0.9
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 06, 2015 at 10:21 PM
--- Server version: 5.6.22
--- PHP Version: 5.5.14
+-- Generation Time: Feb 09, 2015 at 07:18 AM
+-- Server version: 5.6.14
+-- PHP Version: 5.5.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -27,32 +27,27 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_event_bookings` (
-  `id` int(16) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `event_id` int(16) NOT NULL,
   `positions` int(16) NOT NULL DEFAULT '1',
-  `user` int(32) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
+  `user` int(16) NOT NULL,
+  `added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `polo_idx` (`event_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;
 
 --
 -- Dumping data for table `tbl_event_bookings`
 --
 
-INSERT INTO `tbl_event_bookings` (`id`, `event_id`, `positions`, `user`) VALUES
-(1, 7, 1, 1),
-(2, 7, 1, 1),
-(3, 7, 1, 1),
-(9, 8, 1, 1),
-(10, 8, 1, 1),
-(11, 8, 1, 1),
-(12, 8, 1, 1),
-(13, 8, 1, 1),
-(14, 9, 1, 1),
-(15, 8, 1, 1),
-(16, 8, 1, 1),
-(17, 8, 1, 1),
-(18, 8, 1, 1),
-(19, 8, 1, 1),
-(20, 9, 1, 1);
+INSERT INTO `tbl_event_bookings` (`id`, `event_id`, `positions`, `user`, `added`) VALUES
+(2, 10, 1, 1, '2015-02-09 03:51:32'),
+(3, 10, 1, 1, '2015-02-09 03:51:42'),
+(4, 10, 1, 1, '2015-02-09 04:34:41'),
+(5, 10, 1, 1, '2015-02-09 04:36:15'),
+(6, 10, 1, 1, '2015-02-09 04:36:29'),
+(7, 10, 1, 1, '2015-02-09 04:38:14'),
+(8, 10, 1, 1, '2015-02-09 04:38:41');
 
 -- --------------------------------------------------------
 
@@ -61,7 +56,7 @@ INSERT INTO `tbl_event_bookings` (`id`, `event_id`, `positions`, `user`) VALUES
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_event_calendar` (
-  `id` bigint(20) NOT NULL,
+  `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `body` text NOT NULL,
   `start_time` varchar(100) NOT NULL,
@@ -82,27 +77,21 @@ CREATE TABLE IF NOT EXISTS `tbl_event_calendar` (
   `backgroundColor` varchar(32) DEFAULT NULL,
   `borderColor` varchar(32) DEFAULT NULL,
   `textColor` varchar(32) DEFAULT NULL,
-  `max` int(16) NOT NULL DEFAULT '10',
-  `type` varchar(32) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=latin1;
+  `max` int(16) NOT NULL DEFAULT '1',
+  `type` varchar(32) NOT NULL DEFAULT 'default',
+  `status` varchar(45) DEFAULT 'open',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `tbl_event_calendar`
 --
 
-INSERT INTO `tbl_event_calendar` (`id`, `title`, `body`, `start_time`, `end_time`, `location`, `modified_by`, `modification_date`, `allDay`, `url`, `className`, `editable`, `startEditable`, `durationEditable`, `rendering`, `overlap`, `source`, `color`, `backgroundColor`, `borderColor`, `textColor`, `max`, `type`) VALUES
-(7, 'majwega', '', '2015-02-25T00:00:00-05:00', '2015-02-25T00:00:00-05:00', '', 1, '2015-02-06 15:55:13', 0, '', '', 0, 0, 0, '', 0, '', '#3A87AD', '', '', '', 10, 'SME'),
-(8, 'Godfrey', 'erwegrwg', '2015-02-27T04:30:00-05:00', '2015-02-27T05:15:00-05:00', 'ewrweg', 1, '2015-02-06 15:56:50', 0, '', '', 0, 0, 0, '', 0, '', '#3A87AD', '', '', '', 10, 'SME'),
-(9, '', '', '2015-02-26T00:00:00-05:00', '2015-02-26T00:00:00-05:00', '', 1, '2015-02-02 16:22:09', 0, '', '', 0, 0, 0, '', 0, '', '#3A87AD', '', '', '', 10, 'SME'),
-(10, '', '', '2015-02-25T00:00:00-05:00', '2015-02-25T00:00:00-05:00', '', 1, '2015-02-02 16:22:11', 1, '', '', 0, 0, 0, '', 0, '', '#3A87AD', '', '', '', 10, 'webinar'),
-(12, '', 'sds asdsaff', '2015-02-12T14:42:35-05:00', '2015-02-11T11:47:49-05:00', '', 1, '2015-02-02 17:00:27', 1, '', '', 0, 0, 0, '', 0, '', '#3A87AD', '', '', '', 10, 'webinar'),
-(13, '', '', '2015-02-02T00:00:00-0500', '2015-02-02T13:23:27-0500', '', 1, '2015-02-02 17:10:36', 1, '', '', 0, 0, 0, '', 0, '', '#ff9f89 ', '', '', '', 10, 'webinar'),
-(14, '', '', '2015-02-02T00:00:00-0500', '2015-02-02T00:00:00-0500', '', 1, '2015-02-02 17:10:38', 0, '', '', 0, 0, 0, '', 0, '', '#3A87AD', '', '', '', 10, 'SME'),
-(16, 's', 'dssd', '2015-02-03T00:00:00-0500', '2015-02-26T00:00:00-0500', 'sd', 1, '2015-02-03 08:59:32', 1, '', '', 0, 0, 0, '', 0, '', '#ff9f89 ', '', '', '', 232, 'webinar'),
-(17, 's', 'dssd', '2015-02-03T00:00:00-0500', '2015-02-26T00:00:00-0500', 'sd', 1, '2015-02-03 09:36:53', 1, '', '', 0, 0, 0, '', 0, '', '#ff9f89 ', '', '', '', 232, 'webinar'),
-(18, 's', 'dssd', '2015-02-03T00:00:00-0500', '2015-02-26T00:00:00-0500', 'sd', 1, '2015-02-03 09:37:14', 1, '', '', 0, 0, 0, '', 0, '', '#ff9f89 ', '', '', '', 232, 'webinar'),
-(19, 's', 'dssd', '2015-02-03T00:00:00-0500', '2015-02-26T00:00:00-0500', 'sd', 1, '2015-02-03 09:37:41', 1, '', '', 0, 0, 0, '', 0, '', '#ff9f89 ', '', '', '', 23, 'webinar'),
-(20, 'sss', 'dssd', '2015-02-03T00:00:00-0500', '2015-02-26T00:00:00-0500', 'sd', 1, '2015-02-03 09:38:29', 1, '', '', 0, 0, 0, '', 0, '', '#ff9f89 ', '', '', '', 23, 'webinar');
+INSERT INTO `tbl_event_calendar` (`id`, `title`, `body`, `start_time`, `end_time`, `location`, `modified_by`, `modification_date`, `allDay`, `url`, `className`, `editable`, `startEditable`, `durationEditable`, `rendering`, `overlap`, `source`, `color`, `backgroundColor`, `borderColor`, `textColor`, `max`, `type`, `status`) VALUES
+(0, 'sdfs', 'sdfsdf', '2015-02-11T00:00:00-0500', '2015-02-19T00:00:00-0500', 'sdf', 1, '2015-02-07 16:32:12', 0, '', '', 0, 0, 0, '', 0, '', '#3A87AD', '', '', '', 10, 'SME', 'open'),
+(8, 'jkj', 'erwegrwg', '2015-02-27T04:30:00-05:00', '2015-02-27T05:15:00-05:00', 'ewrweg', 1, '2015-02-02 15:35:16', 0, '', '', 0, 0, 0, '', 0, '', '', '', '', '', 1, 'default', 'open'),
+(9, '', '', '2015-02-26T00:00:00-05:00', '2015-02-26T00:00:00-05:00', 'dss', 1, '2015-02-07 23:21:42', 0, '', '', 0, 0, 0, '', 0, '', '#3A87AD', '', '', '', 1, 'null', 'open'),
+(10, '', '', '2015-02-25T00:00:00-05:00', '2015-02-25T00:00:00-05:00', '', 1, '2015-02-02 16:22:11', 0, '', '', 0, 0, 0, '', 0, '', '', '', '', '', 1, 'default', 'open');
 
 -- --------------------------------------------------------
 
@@ -111,67 +100,24 @@ INSERT INTO `tbl_event_calendar` (`id`, `title`, `body`, `start_time`, `end_time
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_event_waiting_list` (
-  `id` int(16) NOT NULL,
+  `id` int(16) NOT NULL AUTO_INCREMENT,
   `event_id` int(16) NOT NULL,
   `user_id` int(16) NOT NULL,
-  `added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+  `added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `positions` int(16) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 --
--- Dumping data for table `tbl_event_waiting_list`
---
-
-INSERT INTO `tbl_event_waiting_list` (`id`, `event_id`, `user_id`, `added`) VALUES
-(1, 21, 8, '2015-02-04 21:54:22'),
-(2, 8, 1, '2015-02-04 22:03:48'),
-(3, 8, 1, '2015-02-04 22:04:46'),
-(4, 8, 1, '2015-02-04 22:05:15'),
-(5, 8, 1, '2015-02-04 22:05:28'),
-(6, 8, 1, '2015-02-04 22:09:32'),
-(7, 8, 1, '2015-02-04 22:10:49'),
-(8, 8, 1, '2015-02-05 14:49:57');
-
---
--- Indexes for dumped tables
+-- Constraints for dumped tables
 --
 
 --
--- Indexes for table `tbl_event_bookings`
+-- Constraints for table `tbl_event_bookings`
 --
 ALTER TABLE `tbl_event_bookings`
-  ADD PRIMARY KEY (`id`);
+  ADD CONSTRAINT `polo` FOREIGN KEY (`event_id`) REFERENCES `tbl_event_calendar` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
---
--- Indexes for table `tbl_event_calendar`
---
-ALTER TABLE `tbl_event_calendar`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `tbl_event_waiting_list`
---
-ALTER TABLE `tbl_event_waiting_list`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `tbl_event_bookings`
---
-ALTER TABLE `tbl_event_bookings`
-  MODIFY `id` int(16) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=21;
---
--- AUTO_INCREMENT for table `tbl_event_calendar`
---
-ALTER TABLE `tbl_event_calendar`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=27;
---
--- AUTO_INCREMENT for table `tbl_event_waiting_list`
---
-ALTER TABLE `tbl_event_waiting_list`
-  MODIFY `id` int(16) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=9;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

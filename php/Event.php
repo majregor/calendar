@@ -18,6 +18,8 @@ class Event {
 	private $color;
 	private $type;
 	private $allDay=0;
+	private $status;
+	private $user;
 	
 	// Full Calendar Event properties
 	private $url;
@@ -115,6 +117,19 @@ class Event {
 	public function getType() {
 		return $this->type;
 	}
+	public function setStatus($status){
+		$this->status = $status;
+	}
+	public function getStatus(){
+		return $this->status;
+	}
+	
+	public function setUser($user){
+		$this->user = $user;
+	}
+	public function getUser(){
+		return $this->user;
+	}
 	
 	public  function makeBooking($eventId, $userId, $positions=1){
 		try{
@@ -124,6 +139,10 @@ class Event {
 															$userId
 			)";
 			DBConnection::save ( $query );
+			
+			$query = "DELETE FROM tbl_event_waiting_list WHERE event_id=$eventId AND user_id=$userId";
+			DBConnection::save ( $query );
+			
 			$this->setAvailablePositions();
 		}
 		catch(Exception $ex){
@@ -210,7 +229,8 @@ class Event {
 															'$event->borderColor',
 															'$event->textColor',
 															$event->max,
-															'$event->type'
+															'$event->type',
+															'$event->status'
 			)";
 			//echo $query;
 			DBConnection::save ( $query );
@@ -221,7 +241,7 @@ class Event {
 	}
 	public static function update($event) {
 		try {
-			$query = "UPDATE tbl_event_calendar SET title = '$event->title', body = '$event->body', start_time='$event->startTime', end_time='$event->endTime', location = '$event->location', modified_by = $event->modifiedBy, modification_date = NOW(), max=$event->max, color='$event->color', type='$event->type', allDay=$event->allDay WHERE id = $event->id";
+			$query = "UPDATE tbl_event_calendar SET title = '$event->title', body = '$event->body', start_time='$event->startTime', end_time='$event->endTime', location = '$event->location', modified_by = $event->modifiedBy, modification_date = NOW(), max=$event->max, color='$event->color', type='$event->type', allDay=$event->allDay, status='$event->status' WHERE id = $event->id";
 			echo $query;
 			DBConnection::save ( $query );
 		} catch ( Exception $ex ) {
@@ -235,6 +255,15 @@ class Event {
 			
 			//Delete from bookings table too
 			$query = "DELETE FROM tbl_event_bookings WHERE event_id = $id";
+			DBConnection::save ( $query );
+			
+		} catch ( Exception $ex ) {
+			$ex->getMessage ();
+		}
+	}
+	public static function changeStatus($id, $status="close") {
+		try {
+			$query = "UPDATE tbl_event_calendar SET status='$status' WHERE id = $id";
 			DBConnection::save ( $query );
 			
 		} catch ( Exception $ex ) {
@@ -270,6 +299,7 @@ class Event {
 			$eventObj->type = $resultRow->type;
 			$eventObj->allDay = $resultRow->allDay;
 			$eventObj->setAvailablePositions();
+			$eventObj->status = $resultRow->status;
 			return $eventObj;
 		} catch ( Exception $ex ) {
 			$ex->getMessage ();
@@ -277,7 +307,7 @@ class Event {
 	}
 	public static function getAllEventObjs() {
 		try {
-			$query = "SELECT id, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i') AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i') AS endTime, location, max, color, type, allDay FROM tbl_event_calendar";
+			$query = "SELECT id, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i') AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i') AS endTime, location, max, color, type, allDay, status FROM tbl_event_calendar";
 			$result = DBConnection::read ( $query );
 			$eventObjs = array();
 			
@@ -295,6 +325,36 @@ class Event {
 				$eventObj->type = $resultRow->type;
 				$eventObj->allDay = $resultRow->allDay;
 				$eventObj->setAvailablePositions();
+				$eventObj->status = $resultRow->status;
+				array_push($eventObjs, $eventObj);
+			}
+			return $eventObjs;
+		} catch ( Exception $ex ) {
+			$ex->getMessage ();
+		}
+	}
+	
+	public static function getBookedEventObjs() {
+		try {
+			$query = "SELECT id, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i') AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i') AS endTime, location, max, color, type, allDay, status FROM tbl_event_calendar";
+			$result = DBConnection::read ( $query );
+			$eventObjs = array();
+			
+			while($resultRow = mysql_fetch_object ( $result )){
+				$eventObj = null;
+				$eventObj = new Event ();
+				$eventObj->id = $resultRow->id;
+				$eventObj->title = $resultRow->title;
+				$eventObj->body = $resultRow->body;
+				$eventObj->startTime = $resultRow->startTime;
+				$eventObj->endTime = $resultRow->endTime;
+				$eventObj->location = $resultRow->location;
+				$eventObj->max = $resultRow->max;
+				$eventObj->color = $resultRow->color;
+				$eventObj->type = $resultRow->type;
+				$eventObj->allDay = $resultRow->allDay;
+				$eventObj->setAvailablePositions();
+				$eventObj->status = $resultRow->status;
 				array_push($eventObjs, $eventObj);
 			}
 			return $eventObjs;
@@ -304,9 +364,26 @@ class Event {
 	}
 	
 	
+	public static function getWaitingEventObjs() {
+		try {
+			$query = "SELECT B.event_id, B.user_id FROM tbl_event_calendar A INNER JOIN tbl_event_waiting_list B ON A.id=B.event_id ORDER BY added DESC";
+			$result = DBConnection::read ( $query );
+			$eventObjs = array();
+			
+			while($resultRow = mysql_fetch_object ( $result )){
+				$eventObj = Event::getEventObj($resultRow->event_id);
+				$eventObj->setUser($resultRow->user_id);
+				array_push($eventObjs, $eventObj);
+			}
+			return $eventObjs;
+		} catch ( Exception $ex ) {
+			$ex->getMessage ();
+		}
+	}
+	
 	public static function getEventUsing($title, $start, $end) {
 		try {
-			$query = "SELECT id, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i') AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i') AS endTime, location, max, color, type, allDay FROM tbl_event_calendar WHERE title = '$title' and start_time = '$start' and end_time = '$end'";
+			$query = "SELECT id, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i') AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i') AS endTime, location, max, color, type, allDay, status FROM tbl_event_calendar WHERE title = '$title' and start_time = '$start' and end_time = '$end'";
 			// echo $query;
 			$result = DBConnection::read ( $query );
 			$resultRow = mysql_fetch_object ( $result );
@@ -323,6 +400,7 @@ class Event {
 			$eventObj->type = $resultRow->type;
 			$eventObj->allDay = $resultRow->allDay;
 			$eventObj->setAvailablePositions();
+			$eventObj->status = $resultRow->status;
 			return $eventObj;
 		} catch ( Exception $ex ) {
 			$ex->getMessage ();
@@ -330,7 +408,7 @@ class Event {
 	}
 	public static function getAllEvents() {
 		try {
-			$query = "SELECT id, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i' ) AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i' ) AS endTime, location, max, color, type, allDay FROM tbl_event_calendar ORDER BY start_time DESC";
+			$query = "SELECT id, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i' ) AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i' ) AS endTime, location, max, color, type, allDay, status FROM tbl_event_calendar ORDER BY start_time DESC";
 			$result = DBConnection::read ( $query );
 			return $result;
 		} catch ( Exception $ex ) {
@@ -339,7 +417,7 @@ class Event {
 	}
 	public static function getAllEventsModifiedByUsingUserLevel($userLevel, $divisionId) {
 		try {
-			$query = "SELECT tbl_event_calendar.id as eId, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i' ) AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i' ) AS endTime, location, max, color, type, allDay FROM tbl_event_calendar, " . "tbl_user_sub_district WHERE tbl_event_calendar.modified_by = tbl_user_sub_district.user_id and tbl_user_sub_district.sub_district_id = $divisionId ORDER BY start_time DESC";
+			$query = "SELECT tbl_event_calendar.id as eId, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i' ) AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i' ) AS endTime, location, max, color, type, allDay, status FROM tbl_event_calendar, " . "tbl_user_sub_district WHERE tbl_event_calendar.modified_by = tbl_user_sub_district.user_id and tbl_user_sub_district.sub_district_id = $divisionId ORDER BY start_time DESC";
 			 
 			$result = DBConnection::read ( $query );
 			return $result;
@@ -349,7 +427,17 @@ class Event {
 	}
 	public static function getAllEventsForUser($userId) {
 		try {
-			$query = "SELECT id, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i' ) AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i' ) AS endTime, location, max, color, type, allDay FROM tbl_event_calendar WHERE modified_by = $userId ORDER BY start_time DESC";
+			$query = "SELECT id, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i' ) AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i' ) AS endTime, location, max, color, type, allDay, status FROM tbl_event_calendar WHERE modified_by = $userId ORDER BY start_time DESC";
+			$result = DBConnection::read ( $query );
+			return $result;
+		} catch ( Exception $ex ) {
+			$ex->getMessage ();
+		}
+	}
+	
+	public static function getAllOpenEventsForUser($userId) {
+		try {
+			$query = "SELECT id, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i' ) AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i' ) AS endTime, location, max, color, type, allDay, status FROM tbl_event_calendar WHERE modified_by = $userId and status='open' ORDER BY start_time DESC";
 			$result = DBConnection::read ( $query );
 			return $result;
 		} catch ( Exception $ex ) {
