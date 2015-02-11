@@ -435,9 +435,9 @@ class Event {
 		}
 	}
 	
-	public static function getAllOpenEventsForUser($userId) {
+	public static function getAllOpenEventsForUser($userId=1) {
 		try {
-			$query = "SELECT id, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i' ) AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i' ) AS endTime, location, max, color, type, allDay, status FROM tbl_event_calendar WHERE modified_by = $userId and status='open' ORDER BY start_time DESC";
+			$query = "SELECT id, title, body, DATE_FORMAT(start_time, '%Y-%m-%dT%H:%i' ) AS startTime, DATE_FORMAT(end_time, '%Y-%m-%dT%H:%i' ) AS endTime, location, max, color, type, allDay, status FROM tbl_event_calendar WHERE status='open' ORDER BY start_time DESC";
 			$result = DBConnection::read ( $query );
 			return $result;
 		} catch ( Exception $ex ) {

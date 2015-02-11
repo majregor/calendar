@@ -16,6 +16,7 @@
 	$q=isset($_REQUEST['q']) ? $_REQUEST['q'] : "";
 	$q1=isset($_REQUEST['q1']) ? $_REQUEST['q1'] : "";
 	
+	
     if($action == 'save'){
     	$title = addslashes($_REQUEST['title']);
     	$body = addslashes($_REQUEST['body']);
@@ -24,7 +25,7 @@
 
       $location = addslashes($_REQUEST['location']);
       //first determine the status of the logged in user...is the user district admin or sub district user...
-      $modifiedBy = 1;
+      $modifiedBy = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 1;
       
       
       //now create the Event object...
@@ -38,15 +39,10 @@
       $event = new Event();
       $event->save($eventObj);
     }else if($action == 'read'){
-          //now I need to read all events only created by the session owner...
           $eventList = null;
           
-        $eventList = Event::getAllOpenEventsForUser(1);
+        $eventList = Event::getAllOpenEventsForUser();
     	$events = array();
-		/*foreach($eventList as &$event){
-			$event->setAvailablePositions();
-		}
-		unset ($event);*/
 		
     	while ($row = mysql_fetch_object($eventList)) {
     	   $eventArray['id'] = $row->id;
@@ -76,7 +72,7 @@
       //now fetch the event object form the database...using title, start and end...
       $eventObj = Event::getEvent($id);
       //now set the new value to the object.
-      $modifiedBy = 1;
+      $modifiedBy = $_SESSION['user']['id'];
       $eventObj->id = $id;
       $eventObj->title = $title;
       $eventObj->body = $body;
@@ -138,7 +134,7 @@
       $eventObj->setBody($body);
       $eventObj->setStartTime($start);
       $eventObj->setEndTime($end);
-      $eventObj->setModifiedBy(1);
+      $eventObj->setModifiedBy($_SESSION['user']['id']);
       $eventObj->setLocation($location);
 	  $eventObj->setMax($max);
 	  $eventObj->setColor($color);
@@ -151,7 +147,7 @@
 	}
 	else if($action == 'book'){
 		$eventId 		=	isset($_REQUEST['id'])			? 	$_REQUEST['id']			: 	"";
-		$positions		=	isset($_REQUEST['positions'])	? 	$_REQUEST['positions'] 	: 	0;
+		$positions		=	isset($_REQUEST['positions'])	? 	$_REQUEST['positions'] 	: 	1;
 		$user			=	isset($_REQUEST['user'])			? 	$_REQUEST['user'] 		: 	"";
 		$eventObj = Event::getEventObj($eventId);
 		$eventObj->makeBooking($eventId,$user,$positions);
@@ -160,7 +156,6 @@
 	}
 	else if($action == 'queue'){
 		$eventId 		=	isset($_REQUEST['id'])			? 	$_REQUEST['id']			: 	"";
-		$user			=	isset($_REQUEST['user'])			? 	$_REQUEST['user'] 		: 	"";
 		$user			=	isset($_REQUEST['user'])			? 	$_REQUEST['user'] 		: 	"";
 		$q			=	isset($_REQUEST['q'])			? 	$_REQUEST['q'] 		: 	"";
 		$q1			=	isset($_REQUEST['q1'])			? 	$_REQUEST['q1'] 		: 	"";

@@ -1,7 +1,15 @@
 <?php 
+session_start();
 // Require our Event class and datetime utilities
 require dirname(__FILE__) . '/php/utils.php';
 
+ $_SESSION['user']['id']= isset($_GET['user_id']) ? $_GET['user_id'] : "";
+ $_SESSION['user']['email']= isset($_GET['email']) ? $_GET['email'] : "";
+ $_SESSION['user']['username']= isset($_GET['username']) ? $_GET['username'] : "";
+ 
+/*echo $_SESSION['user']['id'] ."<br>";
+echo $_SESSION['user']['username'] ."<br>";
+echo $_SESSION['user']['email'] ."<br>";*/
 ?>
 <!DOCTYPE html>
 <html>
@@ -36,7 +44,7 @@ ul#keymap span.grey{background-color:#BFEFFF}
 <body>
 <div>
     	<ul id="keymap">
-        	<li><span class="blue"></span>SME event</li>
+        	<li><span class="blue"></span>SME eventsdafasfsd</li>
             <li><span class="pink"></span>Webinar</li>
             <li><span class="grey"></span>Fully booked SME event</li>
         </ul>
@@ -185,7 +193,7 @@ emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61
 			valid = (selectedAvailable<=0) ? true : false;
 			
 			if(valid){
-				var dataString = "action=queue&id=" + editId + "&user=1";
+				var dataString = "action=queue&id=" + editId + "&user=<?php echo $_SESSION['user']['id'] ?>";
 				$.ajax({
                    url: 'php/eventsController.php',
                    data: dataString,
@@ -219,7 +227,7 @@ emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61
 			 
 			 if(valid){
 			 
-			 	var dataString = "action=book&id=" + editId + "&positions=1&user=1";
+			 	var dataString = "action=book&id=" + editId + "&positions=1&user=<?php echo $_SESSION['user']['id'] ?>";
                 
                  $.ajax({
                    url: 'php/eventsController.php',
